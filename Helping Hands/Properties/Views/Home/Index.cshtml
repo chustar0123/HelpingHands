@@ -1,0 +1,50 @@
+﻿@model List<Business>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+<link rel="stylesheet" href="~/css/home.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<div class="home-section">
+    <div class="image">
+        <img src="~/images/home-img.svg" alt="" />
+    </div>
+    <div class="content">
+        @foreach (var business in Model)
+        {
+            <h1 class="welcome">WELCOME TO @business.OrganizationName</h1>
+        }
+        <p>
+            Our purpose is to provides wound care (e.g lag and foot ulcers, diabetic wounds etc) <br />for those in need in the
+            Nelson Mandela Bay area.
+        </p>
+        <button>Contact us <i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+    </div>
+</div>
+<div class="footer-section">
+     <div class="container">
+         
+         <div class="box">
+            <h3>Contact Info</h3>
+             <div class="icon">
+                @foreach (var business in Model)
+                {
+                
+                
+                 <a href=""><i class="fa fa-users" aria-hidden="true"></i>@business.Nponumber</a>
+
+                 <a href=""><i class="fa fa-map-marker" aria-hidden="true"></i>@business.Address</a>
+
+                 <a href=""><i class="fa fa-phone" aria-hidden="true"></i>@business.ContactNumber</a>
+
+                 <a href=""><i class="fa fa-envelope" aria-hidden="true"></i>@business.Email</a>
+
+                 <a href=""><i class="fa fa-clock-o" aria-hidden="true"></i>@business.OperatingHours</a>
+                }
+             </div>
+            
+        </div>
+     </div>
+</div>

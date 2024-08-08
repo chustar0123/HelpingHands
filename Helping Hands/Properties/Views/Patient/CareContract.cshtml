@@ -1,0 +1,354 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@model CareContract
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+
+}
+
+@{
+    ViewData["Title"] = "CareContract";
+    Layout = "~/Views/Shared/_SecondLayout.cshtml";
+}
+<style>
+    .chumani {
+        position: absolute;
+        top: 100px;
+        right: 8px;
+        padding: 20px;
+        background-color: #8b9eb7; 
+        color: #222831; 
+        border-radius: 5px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        max-width: 300px; 
+    }
+
+        .chumani h2 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .user-type {
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .welcome {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+    }
+
+    span.suburb {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+        text-align: right;
+    }
+
+
+
+    div.contain {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    ul.second {
+        display: inline-block;
+        text-align: left;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .open-button {
+        background-color: #4E76A1;
+        color: white;
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        opacity: 0.8;
+        position: fixed;
+        bottom: 23px;
+        right: 10px;
+        width: 270px;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .chat-popup {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 9px;
+        border: 3px solid #f1f1f1;
+        z-index: 9;
+    }
+
+    .form-container {
+        max-width: 600px;
+        padding: 10px;
+        background-color: white;
+    }
+
+        .form-container textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 5px 0 22px 0;
+            border: none;
+            background: #f1f1f1;
+            resize: none;
+            min-height: 600px;
+        }
+
+            .form-container textarea:focus {
+                background-color: #ddd;
+                outline: none;
+            }
+
+        .form-container .btn {
+            background-color: #04AA6D;
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .form-container .cancel {
+            background-color: red;
+        }
+
+        .form-container .btn:hover, .open-button:hover {
+            opacity: 1;
+        }
+
+    .custom-container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #bed6c5;
+        border-radius: 5px;
+    }
+
+</style>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="~/css/Carecontract.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="~/css/Nursedashboard.css" rel="stylesheet" />
+   
+</head>
+
+
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="header-right">
+                @if (isLoggedIn)
+                {
+                    <span class="welcome">Welcome, @username </span>
+
+                    <span class="user-type">@userType</span>
+                }
+            </div>
+            <div class="main-title">
+            </div>
+        </header>
+
+        <aside id="sidebar" style="background-color:#00416A">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <h5 style="color:white"><i class="fa fa-heartbeat" style="color:white;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h5>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list" style="color:white">
+                <li class="sidebar-list-item">
+                    <a asp-action="PatientDashboard" asp-controller="Patient" class="w3-bar-item w3-button"><i class="fas fa-window-maximize" style="font-size:20px;color:white;"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="SpecityCondition" asp-controller="Patient" id="specifyConditionLink" class="w3-bar-item w3-button"><i class="fa fa-medkit" aria-hidden="true" style="font-size:20px;color:white"></i> Specify Condition</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-controller="Patient" asp-action="ListCareContracts" id="listCareContractsLink" class="w3-bar-item w3-button"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size:20px;color:white"></i> Create Contract</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="PatientProfile" asp-controller="Patient" class="w3-bar-item w3-button"><i class="fa fa-user" aria-hidden="true" style="font-size:20px;color:white"></i> Profile</a>
+                </li>
+                <li class="sidebar-list-item">
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Logout" asp-controller="User" method="post">
+                            <button type="submit" style="background-color:#00416A;border:none;color:white;font-size:15px;"><i class="fa fa-sign-out" aria-hidden="true" style="font-size:20px;color:white"></i> Logout</button>
+                        </form>
+                    }
+                </li>
+
+               
+            </ul>
+        </aside>
+
+
+        <main class="main-container">
+            
+            <div class="custom-container">
+                <div class="formbold-main-wrapper">
+                    <div class="formbold-form-wrapper">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                        }
+                        <form asp-controller="Patient" asp-action="CareContract" method="post">
+                            <div style="text-align:center;">
+                                <h3>Create Care Contract</h3>
+                            </div>
+                            @Html.AntiForgeryToken()
+                            <div>
+                                <label asp-for="ContractDate" class="formbold-form-label"></label>
+                                <input type="date" asp-for="ContractDate" class="formbold-form-input" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
+                                <span asp-validation-for="ContractDate" class="text-danger"></span>
+                            </div>
+                            <div class="formbold-input-flex">
+                                <div>
+                                    <label class="formbold-form-label">City</label>
+                                    <select asp-for="SelectedCityId" class="formbold-form-input" id="cityDropdown">
+                                        <option value="">-- Select City --</option>
+                                    </select>
+                                    <span asp-validation-for="SelectedCityId" class="text-danger"></span>
+                                </div>
+
+                                <div>
+                                    <label asp-for="SelectedSuburbId" class="formbold-form-label"></label>
+                                    <select asp-for="SelectedSuburbId" class="formbold-form-input" id="suburbDropdown">
+                                        <option value="">-- Select Suburb --</option>
+                                    </select>
+                                    <span asp-validation-for="SelectedSuburbId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="formbold-mb-3">
+                                <label asp-for="AddressLine1" class="formbold-form-label"></label>
+                                <input asp-for="AddressLine1" placeholder="Address line 1" class="formbold-form-input formbold-mb-3" />
+                                <span asp-validation-for="AddressLine1" class="text-danger"></span>
+
+
+                                <label asp-for="AddressLine2" class="formbold-form-label"></label>
+                                <input asp-for="AddressLine2" placeholder="Address line 2" class="formbold-form-input" />
+                            </div>
+                            <div class="formbold-mb-3">
+                                <label asp-for="WoundDescription" class="formbold-form-label"></label>
+                                <textarea asp-for="WoundDescription" class="formbold-form-input"></textarea>
+                                <span asp-validation-for="WoundDescription" class="text-danger"></span>
+                            </div>
+                            
+                            
+
+                           
+                            <button class="formbold-btn">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+
+    </div>
+
+
+
+</body>
+<script>
+
+    $(document).ready(function () {
+        var cityDropdown = $("#cityDropdown");
+        var suburbDropdown = $("#suburbDropdown");
+
+        // Initially, disable the suburb dropdown
+        suburbDropdown.prop('disabled', true);
+
+        // Get cities and populate the city dropdown
+        $.get("/Patient/GetCities", function (data) {
+            $.each(data, function (index, item) {
+                cityDropdown.append(new Option(item.text, item.value));
+            });
+        });
+
+        // Handle the city dropdown change event
+        cityDropdown.change(function () {
+            var cityId = $(this).val();
+
+            if (cityId !== "") {
+                // Enable the suburb dropdown
+                suburbDropdown.prop('disabled', false);
+
+                // Get suburbs for the selected city and populate the suburb dropdown
+                $.get("/Patient/GetSuburbsByCity?cityId=" + cityId, function (data) {
+                    suburbDropdown.empty().append('<option value="">-- Select Suburb --</option>');
+                    $.each(data, function (index, item) {
+                        suburbDropdown.append(new Option(item.text, item.value));
+                    });
+                });
+            } else {
+                // If no city is selected, disable the suburb dropdown and clear its options
+                suburbDropdown.prop('disabled', true);
+                suburbDropdown.empty().append('<option value="">-- Select Suburb --</option>');
+            }
+        });
+    });
+
+
+
+    function openForm() {
+        document.getElementById("myForm").style.display = "block";
+    }
+
+    function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+    }
+</script>
+<script src="~/js/Nurse.js"></script>
+
+
+
+
+
+
+

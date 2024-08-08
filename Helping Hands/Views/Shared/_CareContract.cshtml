@@ -1,0 +1,25 @@
+﻿@model IEnumerable<CareContract>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Contract Date</th>
+            <th>Wound Description</th>
+            <th>Suburb</th>
+            <th>Address</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contract in Model)
+        {
+            <tr>
+                <td>@contract.ContractDate</td>
+                <td>@contract.WoundDescription</td>
+                <td>@contract.Suburb.SuburbName</td>
+                <td>@(contract.AddressLine1 + " " + contract.AddressLine2)</td>
+                <td>@contract.ContractStatus</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,359 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+}
+@{
+    ViewData["Title"] = "OfficeManagerDashboard";
+    Layout = "~/Views/Shared/_SecondLayout.cshtml";
+}
+<style>
+    .sidebar-list a, .dropdown-btn {
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 16px;
+        color: white;
+        display: block;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        outline: none;
+    }
+
+        .sidebar-list a:hover, .dropdown-btn:hover {
+            color: #f1f1f1;
+        }
+
+    .main {
+        margin-left: 200px; 
+        font-size: 16px; 
+        padding: 0px 10px;
+    }
+    .dropdown-container {
+        display: none;
+        padding-left: 8px;
+    }
+
+    .active {
+        background-color: green;
+        color: white;
+    }
+
+    .fa-caret-down {
+        float: right;
+        padding-right: 8px;
+    }
+    .notification-container {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        left:auto;
+        align-items: flex-start;
+        padding: 11px; 
+    }
+
+    .notification {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        background-color: #333; 
+        color: white; 
+        border-radius: 50%;
+        margin-right: 10px;
+        top: -14px;
+        right: 30px; 
+    }
+
+        .notification::before {
+            content: "\f0f3"; 
+            font-family: FontAwesome;
+            position: absolute;
+            top: -13px;
+            right: -20px;
+            color: black;
+            font-size: 27px; 
+        }
+
+
+    .badge {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 5px;
+        position: absolute;
+        top: -15px;
+        right: -25px; 
+    }
+
+    .modal-text {
+        color: black;
+    }
+
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .user-type {
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .welcome {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+    }
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/NurseDetails.css">
+    <link rel="stylesheet" href="~/css/NewButtons.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="notification-container">
+                <div class="notification" data-toggle="modal" data-target="#patientModal">
+                    <span class="badge">@ViewBag.NewCareContractCount</span>
+                </div>
+            </div>
+            <div class="modal fade" id="patientModal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="patientModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document" style="overflow:auto;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="patientModalLabel" style="color: black;">Patients with New Care Contracts</h5>
+                            
+                            <button type="button" id="markAsReadButton" class="btn btn-primary">Mark as Read</button>
+                        </div>
+                        <div class="modal-body">
+                            <ul>
+                                @foreach (var patientMessage in ViewBag.PatientMessages)
+                                {
+                                    <li>@patientMessage</li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          
+            <div class="header-right">
+                
+                @if (isLoggedIn)
+                {
+                    <span class="welcome">Welcome, @username </span>
+
+                    <span class="user-type">@userType</span>
+                }
+            </div>
+
+        </header>
+
+        <aside id="sidebar" style="background-color:#004170">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <h5 style="color:white"><i class="fa fa-heartbeat" style="color:white;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h5>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list" style="color:white">
+                <li class="sidebar-list-item">
+                    <a asp-action="OfficeManager" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fas fa-window-maximize" style="font-size:20px;color:white;"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="ChronicCondition" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fa fa-medkit" aria-hidden="true" style="font-size:20px;color:white"></i> Maintain Conditions</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="ChangePassword" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fa fa-unlock-alt" aria-hidden="true" style="font-size:20px;color:white"></i> Change Password</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-book" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        CARE CONTRACTS
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/CareContractsDateRange">Nurse Contracts</a>
+                        <a href="~/OfficeManager/ViewNewContracts">New Contracts</a>
+
+                    </div>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-user-md" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        NURSES
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/NurseDetails">Nurses Per Suburb</a>
+                        <a href="~/OfficeManager/ListContracts">Assign Nurse</a>
+                        <a href="~/OfficeManager/NurseVisitsDateRange">Nurse Visits</a>
+                    </div>
+
+                </li>
+
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-bar-chart" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        REPORTS
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/PatientContractsAndVisits">Contracts and Vists</a>
+                    </div>
+
+                </li>
+                <li class="sidebar-list-item">
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Logout" asp-controller="User" method="post" class="w3-bar-item w3-button">
+                            <button type="submit" style="background-color:#00416A;border:none;color:white;font-size:15px;" class="w3-bar-item w3-button"><i class="fa fa-sign-out" aria-hidden="true" style="font-size:20px;color:white"></i> Logout</button>
+                        </form>
+                    }
+                </li>
+
+
+            </ul>
+        </aside>
+
+
+        <main class="main-container">
+            
+            <div class="main-cards">
+
+                <div class="">
+                    <a href="~/OfficeManager/NurseVisitsDateRange" class="button">
+                        <img src="~/images/CareVisit.png" style="height:150px;width:230px;border-radius: 10px;" />
+                        Nurse Visits
+                    </a>
+
+                </div>
+                <div class="">
+                    <a href="~/OfficeManager/ChronicCondition" class="button">
+                        <img src="~/images/condition.jpg" style="height:150px;width:230px;border-radius: 10px;" />
+                         Conditions
+                    </a>
+
+                </div>
+               
+                <div class="">
+                    <a href="~/OfficeManager/ViewNewContracts" class="button">
+                        <img src="~/images/newContract.jpg" style="height:150px;width:230px;border-radius: 10px;" />
+                        New Contracts
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        </main>
+
+
+    </div>
+    <script src="~/js/Nurse.js"></script>
+</body>
+</html>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script> <!-- Popper.js for Bootstrap modal -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function w3_open() {
+        document.getElementById("mySidebar").style.display = "block";
+    }
+
+    function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+    }
+
+    $(document).ready(function () {
+        $(".notification").click(function () {
+            // Clear any previous messages
+            var patientMessagesList = $("#patientModal .modal-body ul");
+            patientMessagesList.empty();
+
+            // Populate patient messages into the modal
+            var messages = @Html.Raw(Json.Serialize(ViewBag.PatientMessages));
+            $.each(messages, function (index, message) {
+                patientMessagesList.append("<li class='modal-text'>" + message + "</li>");
+            });
+
+            // Attach an event handler to ensure the modal closes correctly
+            $('#patientModal').on('hidden.bs.modal', function () {
+                // Clear the modal content if needed
+                patientMessagesList.empty();
+            });
+
+            // Show the modal
+            $('#patientModal').modal({ backdrop: 'static', keyboard: false });
+        });
+    });
+
+
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+        dropdown[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+            } else {
+                dropdownContent.style.display = "block";
+            }
+        });
+    }
+//Mark as read notification
+    $(document).ready(function () {
+        $(".notification").click(function () {
+            // ... (your existing code)
+
+            // Handle the "Mark as Read" button click
+            $('#markAsReadButton').click(function () {
+                $.ajax({
+                    url: '/OfficeManager/MarkNotificationsAsRead',
+                    type: 'POST',
+                    success: function (data) {
+                        // Update the notification count
+                        $("#patientModal .badge").text(data.newCount);
+                        $(".notification .badge").text(data.newCount);
+
+                        // Close the modal
+                        $('#patientModal').modal('hide');
+                    },
+                    error: function (error) {
+                        // Handle any error appropriately
+                        console.log("Error:", error);
+                    }
+                });
+            });
+        });
+    });
+</script>

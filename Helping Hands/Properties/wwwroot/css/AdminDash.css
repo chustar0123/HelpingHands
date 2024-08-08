@@ -1,0 +1,56 @@
+﻿.header {
+    font-family: 'Trebuchet MS', sans-serif;
+    color: #81A594;
+    padding-left: 30%;
+}
+
+.button {
+    position: relative;
+    padding: 0; /* Remove padding */
+    margin: 0px 10px 10px 10px;
+    font-family: 'Trebuchet MS', sans-serif;
+    float: left;
+    border: 10px solid #3498DB; /* Add border instead of padding */
+    border-radius: 10px;
+    font-size: 25px;
+    color: #00416A;
+    width: 23%;
+    align-items:center;
+    align-content:center;
+    text-decoration: none;
+    display: inline-block; /* Make it an inline block */
+}
+
+    .button img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 10px; /* Apply border-radius to the image */
+    }
+
+.patientheader .button {
+    background-color: #3498DB;
+    border-bottom: 5px solid #2980B9;
+    text-shadow: 0px -2px #2980B9;
+    font-size: 16px;
+}
+
+.doctorheader .button {
+    background-color: #3498DB;
+    border-bottom: 5px solid #2980B9;
+    text-shadow: 0px -2px #2980B9;
+    font-size: 16px;
+}
+
+.adminheader .button {
+    background-color: #3498DB;
+    border-bottom: 5px solid #2980B9;
+    text-shadow: 0px -2px #2980B9;
+    font-size: 24px;
+}
+
+.button:active {
+    transform: translate(0px, 5px);
+    -webkit-transform: translate(0px, 5px);
+    border-bottom: 1px solid;
+}

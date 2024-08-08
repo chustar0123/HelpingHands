@@ -1,0 +1,352 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@model Suburb
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+}@{
+    ViewData["Title"] = "AddSuburb";
+    Layout = "~/Views/Shared/_SecondLayout.cshtml";
+}
+<style>
+    * {
+        font-family: sans-serif;
+    }
+
+    .button {
+        background-color: #19314B;
+        color: white;
+        cursor: pointer;
+        height: 45px;
+        width: 140px;
+        border-radius: 10px;
+        border: none;
+    }
+
+    .button1 {
+        background-color: #19314B;
+        color: white;
+        cursor: pointer;
+        height: 50px;
+        width: 100px;
+        border-radius: 25px;
+        border: none;
+    }
+
+    .button {
+        background-color: #19314B;
+        color: white;
+        cursor: pointer;
+        height: 50px;
+        width: 150px;
+        border-radius: 25px;
+        border: none;
+    }
+
+    .bold-label {
+        font-weight: bold;
+    }
+
+    .wider-input {
+        width: 50%; /* You can adjust the width as needed */
+    }
+
+    .wider-textarea {
+        width: 50%; /* You can adjust the width as needed */
+    }
+
+    .rounded-container {
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #DCDCDC;
+        position: fixed;
+        height: 440px;
+        width: 700px;
+        text-align: left;
+        top: 25%;
+        left: 38%;
+    }
+
+    .content-table {
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em;
+        min-width: 400px;
+        border-radius: 5px 5px 0 0;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+        .content-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .content-table th,
+        .content-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .content-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+            .content-table tbody tr:nth-of-type(even) {
+                background-color: #f3f3f3;
+            }
+
+            .content-table tbody tr:last-of-type {
+                border-bottom: 2px solid #009879;
+            }
+
+            .content-table tbody tr.active-row {
+                font-weight: bold;
+                color: #009879;
+            }
+
+    .container {
+        position: absolute;
+        top: 11px;
+        right: 5px;
+        padding: 20px;
+        background-color: #8b9eb7; /* Choose your preferred background color */
+        color: #222831; /* Text color */
+        border-radius: 5px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        max-width: 240px; /* Adjust the maximum width as needed */
+    }
+
+        .container h2 {
+            font-size: 24px;
+            font-weight: bold; /* Add this line to make the text bold */
+        }
+
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .user-type {
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .welcome {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+    }
+
+    * {
+        font-family: sans-serif;
+    }
+
+    .sidebar-list a, .dropdown-btn {
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 15px;
+        color: white;
+        display: block;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        outline: none;
+    }
+
+        .sidebar-list a:hover, .dropdown-btn:hover {
+            color: #f1f1f1;
+        }
+
+    .main {
+        margin-left: 200px;
+        font-size: 15px;
+        padding: 0px 10px;
+    }
+
+    .dropdown-container {
+        display: none;
+        padding-left: 8px;
+    }
+
+    .active {
+        background-color: green;
+        color: white;
+    }
+
+    .fa-caret-down {
+        float: right;
+        padding-right: 8px;
+    }
+</style>
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/NurseDetails.css">
+    <link rel="stylesheet" href="~/css/AdminDash.css" />
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="main-title">
+                <p class="font-weight-bold">Admin Dashboard</p>
+            </div>
+            <div class="header-right">
+                @if (isLoggedIn)
+                {
+                    <span class="welcome">Welcome, @username </span>
+
+                    <span class="user-type">@userType</span>
+                }
+            </div>
+
+        </header>
+
+        <aside id="sidebar" style="background-color:#00416A">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <h5 style="color:white"><i class="fa fa-heartbeat" style="color:white;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h5>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list" style="color:white">
+                <li class="sidebar-list-item">
+                    <a asp-action="AdminDashboard" asp-controller="User" class="w3-bar-item w3-button"><i class="fas fa-window-maximize" style="font-size:20px;color:white;"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-plus-circle" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        Manage Nurses
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/User/AddNurse"> Add Nurse</a>
+                        <a href="~/User/DeactivateNurse">Deactivate Nurse</a>
+                        <a href="~/User/ActivateNurse">Activate Nurse</a>
+
+                    </div>
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-plus-circle" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        Manage O/Manager
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/User/AddOfficeManager"> Add Office Manager</a>
+                        <a href="~/User/DeactivateOfficeManager">Deactivate Office Manager</a>
+                        <a href="~/User/ActivateOfficeManager">Activate Office Manager</a>
+
+                    </div>
+                </li>
+
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-location-arrow" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        Manage Location
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/User/Cities"> Manage Cities</a>
+                        <a href="~/User/Suburb">Manage Suburbs</a>
+
+
+                    </div>
+                </li>
+
+                <li class="sidebar-list-item">
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Logout" asp-controller="User" method="post">
+                            <button type="submit" style="background-color:#00416A; font-size:15px; border:none;color:white"><i class="fa fa-sign-out" aria-hidden="true" style="font-size:20px;color:white"></i> Logout</button>
+                        </form>
+                    }
+                </li>
+
+
+            </ul>
+        </aside>
+
+
+        <main class="main-container">
+
+            <h5 style="text-align:center;font-weight:bold;">ADD SUBURBS</h5>
+            <div class="rounded-container">
+                
+                <form method="post" asp-action="AddSuburb">
+                    <div class="form-group">
+                        <label style="font-weight:bold;" for="CityId">City</label>
+                        <select class="form-control" id="CityId" name="CityId" required>
+                            @foreach (var city in ViewBag.Cities)
+                            {
+                                <option value="@city.Value">@city.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <label style="font-weight:bold;" for="SuburbName">Suburb Name</label>
+                        <input type="text" class="form-control" id="SuburbName" name="SuburbName" required />
+                    </div>
+                    
+                    
+                    <br />
+                    <div class="form-group">
+                        <label style="font-weight:bold;" for="PostalCode">Postal Code</label>
+                        <input type="number" class="form-control" id="PostalCode" name="PostalCode" required />
+                    </div>
+                    <br />
+                    <br />
+                    <button type="submit" class="btn btn-success">Add Suburb</button>
+                </form>
+
+
+            </div>
+
+
+
+        </main>
+
+
+    </div>
+
+    <script src="~/js/Nurse.js"></script>
+</body>
+<script>
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+        dropdown[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+            } else {
+                dropdownContent.style.display = "block";
+            }
+        });
+    }
+</script>
+

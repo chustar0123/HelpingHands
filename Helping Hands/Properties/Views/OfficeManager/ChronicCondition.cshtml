@@ -1,0 +1,455 @@
+﻿@model List<Helping_Hands.Models.ChronicCondition>
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+}
+@{
+    ViewData["Title"] = "ChronicCondition";
+    Layout = "~/Views/Shared/_SecondLayout.cshtml";
+}
+<style>
+    * {
+        font-family: sans-serif;
+    }
+
+    .content-table {
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em;
+        min-width: 400px;
+        border-radius: 5px 5px 0 0;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        margin-left: 0;
+    }
+
+        .content-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .content-table th,
+        .content-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .content-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+            .content-table tbody tr:nth-of-type(even) {
+                background-color: #f3f3f3;
+            }
+
+            .content-table tbody tr:last-of-type {
+                border-bottom: 2px solid #009879;
+            }
+
+            .content-table tbody tr.active-row {
+                font-weight: bold;
+                color: #009879;
+            }
+
+    .sidebar-list a, .dropdown-btn {
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 16px;
+        color: white;
+        display: block;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        outline: none;
+    }
+
+        .sidebar-list a:hover, .dropdown-btn:hover {
+            color: #f1f1f1;
+        }
+
+    .main {
+        margin-left: 200px;
+        font-size: 16px;
+        padding: 0px 10px;
+    }
+
+    .dropdown-container {
+        display: none;
+        padding-left: 8px;
+    }
+
+    .active {
+        background-color: green;
+        color: white;
+    }
+
+    .fa-caret-down {
+        float: right;
+        padding-right: 8px;
+    }
+
+    .notification-container {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding: 11px;
+    }
+
+    .notification {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        background-color: #333;
+        color: white;
+        border-radius: 50%;
+        margin-right: 10px;
+        top: -14px;
+        right: -20px;
+    }
+
+        .notification::before {
+            content: "\f0f3";
+            font-family: FontAwesome;
+            position: absolute;
+            top: -13px;
+            right: -20px;
+            color: black;
+            font-size: 27px;
+        }
+
+
+    .badge {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 5px;
+        position: absolute;
+        top: -15px;
+        right: -25px;
+    }
+
+    .modal-text {
+        color: black;
+    }
+
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .user-type {
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .welcome {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+    }
+
+
+    #nurseListBox {
+        width: 1000px; /* Adjust the width as needed */
+        height: 200px; /* Adjust the height as needed */
+        border: 1px solid #ccc;
+        padding: 5px;
+        margin-top: 20px; /* Add margin to move it down */
+    }
+
+        /* Style for option elements */
+        #nurseListBox option {
+            padding: 5px;
+            background-color: #f0f0f0;
+            border: none;
+        }
+
+            /* Hover effect for option elements */
+            #nurseListBox option:hover {
+                background-color: #d0d0d0;
+                cursor: pointer;
+            }
+
+    .button-container {
+        display: inline-block;
+        vertical-align: top; /* Align buttons to the top of the table */
+    }
+    /*LISTBOX*/
+    .custom-select {
+        width: 100%;
+        padding: 5px;
+    }
+
+    .custom-option {
+        display: flex;
+        align-items: center;
+    }
+
+    .option-text {
+        margin-left: 10px; /* Add left margin for separation */
+    }
+
+    .right-aligned {
+        text-align: right;
+        margin-right: 0; /* Adjust the margin as needed */
+    }
+
+    .button {
+        background-color: #19314B;
+        color: white;
+        cursor: pointer;
+        height: 45px;
+        width: 140px;
+        border-radius: 10px;
+        border: none;
+    }
+
+    .button1 {
+        background-color: #19314B;
+        color: white;
+        cursor: pointer;
+        height: 50px;
+        width: 100px;
+        border-radius: 25px;
+        border: none;
+    }
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/NurseDetails.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+
+            <div class="header-right">
+
+                @if (isLoggedIn)
+                {
+                    <span class="welcome">Welcome, @username </span>
+
+                    <span class="user-type">@userType</span>
+                }
+            </div>
+
+        </header>
+
+        <aside id="sidebar" style="background-color:#004170">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <h5 style="color:white"><i class="fa fa-heartbeat" style="color:white;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h5>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list" style="color:white">
+                <li class="sidebar-list-item">
+                    <a asp-action="OfficeManager" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fas fa-window-maximize" style="font-size:20px;color:white;"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="ChronicCondition" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fa fa-medkit" aria-hidden="true" style="font-size:20px;color:white"></i> Maintain Conditions</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="ChangePassword" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fa fa-unlock-alt" aria-hidden="true" style="font-size:20px;color:white"></i> Change Password</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-book" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        CARE CONTRACTS
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/CareContractsDateRange">Nurse Contracts</a>
+                        <a href="~/OfficeManager/ViewNewContracts">New Contracts</a>
+
+                    </div>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-user-md" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        NURSES
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/NurseDetails">Nurses Per Suburb</a>
+                        <a href="~/OfficeManager/ListContracts">Assign Nurse</a>
+                        <a href="~/OfficeManager/NurseVisitsDateRange">Nurse Visits</a>
+                    </div>
+
+                </li>
+
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-bar-chart" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        REPORTS
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/PatientContractsAndVisits">Contracts and Vists</a>
+                    </div>
+
+                </li>
+                <li class="sidebar-list-item">
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Logout" asp-controller="User" method="post" class="w3-bar-item w3-button">
+                            <button type="submit" style="background-color:#00416A;border:none;color:white;font-size:15px;" class="w3-bar-item w3-button"><i class="fa fa-sign-out" aria-hidden="true" style="font-size:20px;color:white"></i> Logout</button>
+                        </form>
+                    }
+                </li>
+
+
+            </ul>
+        </aside>
+
+
+        <main class="main-container">
+            <h5 style="text-align:center;font-weight:bold;">MANAGE CHRONIC CONDITIONS</h5>
+            <p>
+                <form action="~/OfficeManager/InsertCondition" method="get">
+                    <button type="submit" class="button">Add Condition</button>
+                </form>
+            </p>
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (Model.Any())
+            {
+               
+
+               
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr class="active-row">
+
+                                <th>Condition Name</th>
+                                <th>Description</th>
+                               <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var condition in Model)
+                            {
+                                <tr>
+                                    <td>@condition.ConditionName</td>
+                                    <td>@condition.Description</td>
+                                   <td>
+                                        <button class="visit-patient" style="background-color:#50c878;border:none;border-radius:5px;height:30px;width:80px;" data-contract-id="@condition.ConditionId">Update</button>
+                                   </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            }
+            else
+            {
+                <h5 style="text-align:center;font-weight:bold;">No chronic conditions.</h5>
+            }
+
+
+        </main>
+
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/Nurse.js"></script>
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+        $(".visit-patient").click(function () {
+            var conditionId = $(this).data("contract-id");
+            $("#conditionId").val(conditionId);
+            confirmAssignNurse(conditionId);
+        });
+    });
+    function confirmAssignNurse(conditionId) {
+        var confirmation = confirm("You want to update this condition?");
+        if (confirmation) {
+            window.location.href = `/OfficeManager/UpdateCondition?conditionId=${conditionId}`;
+        }
+    }
+
+
+
+
+    function w3_open() {
+        document.getElementById("mySidebar").style.display = "block";
+    }
+
+    function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+    }
+
+
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+        dropdown[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+            } else {
+                dropdownContent.style.display = "block";
+            }
+        });
+    }
+
+
+
+    $(document).ready(function () {
+        $(".assign-nurse").click(function () {
+            var contractId = $(this).data("contract-id");
+            $("#contractId").val(contractId); // Set the contractId in the hidden field
+        });
+    });
+
+    $(document).ready(function () {
+        $(".assign-nurse").click(function () {
+            var contractId = $(this).data("suburb-id");
+            $("#suburbId").val(suburbId); // Set the contractId in the hidden field
+        });
+    });
+    $(document).ready(function () {
+        $(".assign-nurse").click(function () {
+            var selectedNurseId = $(this).data("selectedNurse-id");
+            $("#selectedNurseId").val(selectedNurseId); // Set the contractId in the hidden field
+        });
+    });
+
+</script>
+

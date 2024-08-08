@@ -1,0 +1,465 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@model List<Helping_Hands.Models.NurseViewModel>
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+}
+@{
+    
+    ViewData["Title"] = "Assign Nurse";
+    Layout = "~/Views/Shared/_SecondLayout.cshtml";
+}
+
+<style>
+    * {
+        font-family: sans-serif;
+    }
+
+    .content-table {
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em;
+        min-width: 400px;
+        border-radius: 5px 5px 0 0;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        margin-left: 0;
+    }
+
+        .content-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .content-table th,
+        .content-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .content-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+            .content-table tbody tr:nth-of-type(even) {
+                background-color: #f3f3f3;
+            }
+
+            .content-table tbody tr:last-of-type {
+                border-bottom: 2px solid #009879;
+            }
+
+            .content-table tbody tr.active-row {
+                font-weight: bold;
+                color: #009879;
+            }
+
+    .sidebar-list a, .dropdown-btn {
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 16px;
+        color: white;
+        display: block;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        outline: none;
+    }
+
+        .sidebar-list a:hover, .dropdown-btn:hover {
+            color: #f1f1f1;
+        }
+
+    .main {
+        margin-left: 200px;
+        font-size: 16px;
+        padding: 0px 10px;
+    }
+
+    .dropdown-container {
+        display: none;
+        padding-left: 8px;
+    }
+
+    .active {
+        background-color: green;
+        color: white;
+    }
+
+    .fa-caret-down {
+        float: right;
+        padding-right: 8px;
+    }
+
+    .notification-container {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding: 11px;
+    }
+
+    .notification {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        background-color: #333;
+        color: white;
+        border-radius: 50%;
+        margin-right: 10px;
+        top: -14px;
+        right: -20px;
+    }
+
+        .notification::before {
+            content: "\f0f3";
+            font-family: FontAwesome;
+            position: absolute;
+            top: -13px;
+            right: -20px;
+            color: black;
+            font-size: 27px;
+        }
+
+
+    .badge {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 5px;
+        position: absolute;
+        top: -15px;
+        right: -25px;
+    }
+
+    .modal-text {
+        color: black;
+    }
+
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .user-type {
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .welcome {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+    }
+
+  
+    #nurseListBox {
+        width: 1000px; /* Adjust the width as needed */
+        height: 200px; /* Adjust the height as needed */
+        border: 1px solid #ccc;
+        padding: 5px;
+        margin-top: 20px; /* Add margin to move it down */
+    }
+
+    /* Style for option elements */
+    #nurseListBox option {
+        padding: 5px;
+        background-color: #f0f0f0;
+        border: none;
+    }
+
+        /* Hover effect for option elements */
+        #nurseListBox option:hover {
+            background-color: #d0d0d0;
+            cursor: pointer;
+        }
+
+    .button-container {
+        display: inline-block;
+        vertical-align: top; /* Align buttons to the top of the table */
+    }
+    /*LISTBOX*/
+    .custom-select {
+        width: 100%;
+        padding: 5px;
+    }
+
+    .custom-option {
+        display: flex;
+        align-items: center;
+    }
+
+    .option-text {
+        margin-left: 10px; /* Add left margin for separation */
+    }
+
+    .right-aligned {
+        text-align: right;
+        margin-right: 0; /* Adjust the margin as needed */
+    }
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/NurseDetails.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+
+            <div class="header-right">
+
+                @if (isLoggedIn)
+                {
+                    <span class="welcome">Welcome, @username </span>
+
+                    <span class="user-type">@userType</span>
+                }
+            </div>
+
+        </header>
+
+        <aside id="sidebar" style="background-color:#004170">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <h5 style="color:white"><i class="fa fa-heartbeat" style="color:white;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h5>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list" style="color:white">
+                <li class="sidebar-list-item">
+                    <a asp-action="OfficeManager" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fas fa-window-maximize" style="font-size:20px;color:white;"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="ChronicCondition" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fa fa-medkit" aria-hidden="true" style="font-size:20px;color:white"></i> Maintain Conditions</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="ChangePassword" asp-controller="OfficeManager" class="w3-bar-item w3-button"><i class="fa fa-unlock-alt" aria-hidden="true" style="font-size:20px;color:white"></i> Change Password</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-book" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        CARE CONTRACTS
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/CareContractsDateRange">Nurse Contracts</a>
+                        <a href="~/OfficeManager/ViewNewContracts">New Contracts</a>
+
+                    </div>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-user-md" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        NURSES
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/NurseDetails">Nurses Per Suburb</a>
+                        <a href="~/OfficeManager/ListContracts">Assign Nurse</a>
+                        <a href="~/OfficeManager/NurseVisitsDateRange">Nurse Visits</a>
+                    </div>
+
+                </li>
+
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-bar-chart" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        REPORTS
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/OfficeManager/PatientContractsAndVisits">Contracts and Vists</a>
+                    </div>
+
+                </li>
+                <li class="sidebar-list-item">
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Logout" asp-controller="User" method="post" class="w3-bar-item w3-button">
+                            <button type="submit" style="background-color:#00416A;border:none;color:white;font-size:15px;" class="w3-bar-item w3-button"><i class="fa fa-sign-out" aria-hidden="true" style="font-size:20px;color:white"></i> Logout</button>
+                        </form>
+                    }
+                </li>
+
+
+            </ul>
+        </aside>
+
+
+        <main class="main-container">
+            @{
+                DateTime? PreviousDate = null;
+            }
+            <h6 style="text-align:center;font-weight:bold;color:#2b4570">Step 2: Select Nurse</h6>
+            <br />
+            <div style="text-align:right;top:50px;right:100%">
+
+                <div style="width: 300px; height: 112px;border-radius: 5px; padding: 10px;overflow: auto; position: absolute;right:20px;top:25%;background-color:#F0F0F0;">
+                    <div style="text-align: left;">
+                        @foreach (var contractDate in Model)
+                        {
+                            if (contractDate.ContractDate != PreviousDate)
+                            {
+                                <h6 style="font-weight: bold;">Contract Date: <span style="font-weight:normal;">@string.Format("{0:yyyy-MM-dd}", contractDate.ContractDate?.ToString("d MMMM yyyy"))</span></h6>
+                                <h6 style="font-weight: bold;">Start Care Date: <span style="font-weight:normal;">@DateTime.Now.ToString("d MMMM yyyy")</span></h6>
+                                PreviousDate = contractDate.ContractDate;
+
+                            }
+                        }
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            @{
+                string previousSuburbName = null;
+            }
+            <div style="left:30px">
+                @foreach (var nurse in Model)
+                {
+                    if (nurse.SuburbName != previousSuburbName)
+                    {
+
+                       
+                        <di style="text-align:center;">
+                            <h6 style="font-weight:bold;">Wound Description:</h6>
+                            <span style="width: 250px; height: 109px; background-color: #f0f0f0; padding: 5px;border-radius: 5px; overflow: auto; position: fixed; left: 63%; top: 33%; transform: translate(-50%, -50%);">
+                                <div style="text-align: left;">
+                                    @nurse.WoundDescription
+                                </div>
+                            </span>
+
+                        </di>
+                        <h6 style="font-weight:bold;">Patient Information:</h6>
+
+                        @nurse.PatientFirstName
+                        <br />
+                        @nurse.AddressLine1
+                        <br />
+                        @nurse.SuburbName
+                        previousSuburbName = nurse.SuburbName;
+                        <br>
+                        @nurse.PostalCode
+                        <br />
+                        <br />
+                   
+                    }
+                }
+            </div>
+            <div style="text-align:left; top:10px;">
+                <br />
+                <h5 style="color:red;text-align:left;">Available Nurses:</h5>
+                <i style="color:#2b4570;text-align:left;">Select a nurse that you want to assign</i>
+
+            </div>
+            <form asp-action="SaveAssignedNurse" asp-controller="OfficeManager" method="get" style="width: 700px;">
+
+                <input type="hidden" id="contractId" name="contractId" value="@ViewData["contractId"]" />
+                <input type="hidden" id="suburbId" name="suburbId" value="@ViewData["suburbId"]" />
+             
+                <select name="selectedNurseId" multiple class="custom-select" required>
+                    @foreach (var nurse in Model)
+                    {
+                        <option value="@nurse.NurseId" class="custom-option">
+                            @nurse.FirstName @nurse.Surname
+                            <span class="option-text">Contact: @nurse.ContactNumber</span>
+                            <span class="option-text">Email: @nurse.EmailAddress</span>
+                        </option>
+                    }
+                </select>
+
+                <br />
+                <br />
+                <a asp-action="ListContracts" asp-controller="OfficeManager" class="btn btn-success">Back</a>
+
+                <div class="button-container">
+                    <button type="submit" class="btn btn-success">Next</button>
+                </div>
+            </form>
+
+
+
+
+        </main>
+
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/Nurse.js"></script>
+</body>
+</html>
+
+<script>
+    function w3_open() {
+        document.getElementById("mySidebar").style.display = "block";
+    }
+
+    function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+    }
+
+
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+        dropdown[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+            } else {
+                dropdownContent.style.display = "block";
+            }
+        });
+    }
+
+
+
+    $(document).ready(function () {
+        $(".assign-nurse").click(function () {
+            var contractId = $(this).data("contract-id");
+            $("#contractId").val(contractId); // Set the contractId in the hidden field
+        });
+    });
+
+    $(document).ready(function () {
+        $(".assign-nurse").click(function () {
+            var contractId = $(this).data("suburb-id");
+            $("#suburbId").val(suburbId); // Set the contractId in the hidden field
+        });
+    });
+    $(document).ready(function () {
+        $(".assign-nurse").click(function () {
+            var selectedNurseId = $(this).data("selectedNurse-id");
+            $("#selectedNurseId").val(selectedNurseId); // Set the contractId in the hidden field
+        });
+    });
+
+</script>

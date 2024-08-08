@@ -1,0 +1,61 @@
+﻿.rounded-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #DCDCDC;
+    position: fixed;
+    height: 440px;
+    width: 600px;
+    text-align: left;
+    top: 25%;
+    left: 38%;
+}
+
+.datepicker {
+    display: inline-block;
+    position: relative;
+    width: 250px;
+    border-radius: 5px;
+}
+
+/* Datepicker input */
+.datepicker-input {
+    width: 70%;
+    padding: 10px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+}
+
+/* Datepicker calendar (you may need JavaScript to show it) */
+.datepicker-calendar {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: none; /* You can make it visible when the user clicks on the input */
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+    /* Datepicker calendar cell (day) */
+    .datepicker-calendar td {
+        text-align: center;
+        padding: 5px;
+    }
+
+        /* Style for today's date (you can customize it) */
+        .datepicker-calendar td.today {
+            background: #007BFF;
+            color: #fff;
+            border-radius: 50%;
+        }
+
+        /* Style for selected date (you can customize it) */
+        .datepicker-calendar td.selected {
+            background: #FF5733;
+            color: #fff;
+            border-radius: 50%;
+        }

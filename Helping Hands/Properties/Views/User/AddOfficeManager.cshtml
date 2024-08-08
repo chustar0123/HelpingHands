@@ -1,0 +1,305 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@model AddUserViewModel
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+}
+@{
+    ViewData["Title"] = "AddOfficeManager";
+    Layout = "~/Views/Shared/_SecondLayout.cshtml";
+}
+<head>
+    <link rel="stylesheet" href="~/css/AdminDash.css" />
+</head>
+<style>
+
+
+
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .user-type {
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .welcome {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+    }
+
+    * {
+        font-family: sans-serif;
+    }
+
+    .sidebar-list a, .dropdown-btn {
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 15px;
+        color: white;
+        display: block;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        outline: none;
+    }
+
+        .sidebar-list a:hover, .dropdown-btn:hover {
+            color: #f1f1f1;
+        }
+
+    .main {
+        margin-left: 200px;
+        font-size: 15px;
+        padding: 0px 10px;
+    }
+
+    .dropdown-container {
+        display: none;
+        padding-left: 8px;
+    }
+
+    .active {
+        background-color: green;
+        color: white;
+    }
+
+    .fa-caret-down {
+        float: right;
+        padding-right: 8px;
+    }
+    .new {
+        color: red;
+    }
+
+    .now {
+        padding: 10px 50px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        border: 0;
+        color: #fff;
+        background: #00668d;
+        margin: 0 auto;
+        display: block;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+
+    .form_box select {
+        font-family: arial;
+        width: 100%;
+        margin: 0 0 3px;
+        padding: 13px 15px;
+        font-size: 20px;
+        color: #000;
+        border-radius: 5px;
+        background: #d3d1d1;
+        border: 1px solid transparent;
+        justify-content: center;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 50px;
+    }
+
+
+
+    .form_box {
+        width: 600px;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 7px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .new-container {
+        display: flex;
+        justify-content: center; /* Horizontally center the content */
+        align-items: center; /* Vertically center the content */
+        height: 100vh; /* Set the container's height to 100% of the viewport height */
+    }
+</style>
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/NurseDetails.css">
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="main-title">
+                <p class="font-weight-bold">Admin Dashboard</p>
+            </div>
+            <div class="header-right">
+                @if (isLoggedIn)
+                {
+                    <span class="welcome">Welcome, @username </span>
+
+                    <span class="user-type">@userType</span>
+                }
+            </div>
+
+        </header>
+
+        <aside id="sidebar" style="background-color:#00416A">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <h5 style="color:white"><i class="fa fa-heartbeat" style="color:white;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h5>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list" style="color:white">
+                <li class="sidebar-list-item">
+                    <a asp-action="AdminDashboard" asp-controller="User" class="w3-bar-item w3-button"><i class="fas fa-window-maximize" style="font-size:20px;color:white;"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-plus-circle" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        Manage Nurses
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/User/AddNurse"> Add Nurse</a>
+                        <a href="~/User/DeactivateNurse">Deactivate Nurse</a>
+                        <a href="~/User/ActivateNurse">Activate Nurse</a>
+
+                    </div>
+                </li>
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-plus-circle" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        Manage O/Manager
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/User/AddOfficeManager"> Add Office Manager</a>
+                        <a href="~/User/DeactivateOfficeManager">Deactivate Office Manager</a>
+                        <a href="~/User/ActivateOfficeManager">Activate Office Manager</a>
+
+                    </div>
+                </li>
+
+                <li class="sidebar-list-item">
+                    <button class="dropdown-btn">
+                        <i class="fa fa-location-arrow" aria-hidden="true" style="font-size:20px;color:white"></i>
+                        Manage Location
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-container">
+                        <a href="~/User/Cities"> Manage Cities</a>
+                        <a href="~/User/Suburb">Manage Suburbs</a>
+
+
+                    </div>
+                </li>
+
+                <li class="sidebar-list-item">
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Logout" asp-controller="User" method="post">
+                            <button type="submit" style="background-color:#00416A; font-size:15px; border:none;color:white"><i class="fa fa-sign-out" aria-hidden="true" style="font-size:20px;color:white"></i> Logout</button>
+                        </form>
+                    }
+                </li>
+
+
+            </ul>
+        </aside>
+        <main class="main-container">
+            <div class="new-container">
+                <form name="custom_form" asp-controller="User" asp-action="AddOfficeManager" method="post">
+                    <div class="form_box">
+                        @if (TempData.ContainsKey("OfficeManagerMessage") && (bool)TempData["OfficeManagerMessage"] == true)
+                        {
+                            <div class="alert alert-success">
+                                <p>Office Manager successfully added! <span class="green-tick">✔</span></p>
+                            </div>
+                        }
+                        <h3 style="font-weight:bold;text-align:center;">Add Office Manager</h3>
+                        <div class="container">
+                            <div class="form-row">
+                                <form asp-controller="User" asp-action="AddOfficeManager" method="post">
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="col">
+                                        <label asp-for="UserName" class="control-label">Username<span class="new">*</span></label>
+                                        <input asp-for="UserName" class="form-control" />
+                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                    </div>
+                                    <div class="col">
+                                        <label asp-for="Password" class="control-label">Password<span class="new">*</span></label>
+
+                                        <input asp-for="Password" type="password" class="form-control" />
+
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+
+                                    </div>
+                                    <div class="col">
+                                        <label asp-for="Email" class="control-label">Email Address<span class="new">*</span></label>
+                                        <input asp-for="Email" class="form-control" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                    <div class="col">
+                                        <label asp-for="PhoneNumber" class="control-label">Contact Number<span class="new">*</span></label>
+                                        <input asp-for="PhoneNumber" class="form-control" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                    <br />
+                                    <div class="form-group">
+
+                                        <button class="now">Add Office Manager</button>
+                                    </div>
+                                    @Html.AntiForgeryToken()
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+
+    </div>
+
+    <script src="~/js/Nurse.js"></script>
+</body>
+<script>
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+        dropdown[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+            } else {
+                dropdownContent.style.display = "block";
+            }
+        });
+    }
+</script>

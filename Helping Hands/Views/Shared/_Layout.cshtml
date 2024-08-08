@@ -1,0 +1,109 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+}
+
+<!DOCTYPE html>
+
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Helping_Hands</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Helping_Hands.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+</head>
+<style>
+    .user-type{
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .welcome{
+        font-weight: bold;
+        color: #4E76A1;
+        font-size:18px;
+        
+    }
+
+    .logout{
+        font-weight: bold;
+        background-color: #6287AF;
+        color:white;
+        cursor: pointer;
+        border: 0;
+        border-radius: 5px;
+        height: 34px;
+    }
+</style>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top" style="background-color:#CCCCFF;">
+            <div class="container-fluid">
+               
+                
+                    <div>
+                        <h4 style="color:#284F78"><i class="fa fa-heartbeat" style="color:#16A085;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h4>
+
+                    </div>
+              
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ml-auto">
+                            
+                            @if (isLoggedIn)
+                            {
+                                <li class="nav-item">
+                                    <span class="welcome">Welcome, @username </span><span class="user-type">@userType</span>
+                                    
+                                </li>
+                            }
+                            else
+                            {
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Register" asp-action="Register"><i class="fa fa-user-plus" style="color:#284F78;"></i>Register</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Login"><i class="fa fa-fw fa-user" style="color:#284F78;"></i>Login</a>
+                                </li>
+                               
+                            }
+                        </ul>
+                    </div>
+                </nav>
+
+
+               
+            </div>
+            
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+

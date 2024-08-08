@@ -1,0 +1,279 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@model PatientProfileViewModel
+@using Microsoft.AspNetCore.Authentication.Cookies
+@{
+    var username = Context.Session.GetString("Username");
+    var userType = Context.Session.GetString("UserType");
+    var isLoggedIn = !string.IsNullOrEmpty(username);
+
+    bool hasNurseDetails = !string.IsNullOrEmpty(Model.Surname);
+}
+@{
+    ViewData["Title"] = "Specity Condition";
+    Layout = "~/Views/Shared/_SecondLayout.cshtml";
+}
+<style>
+    .header-right {
+        position: absolute;
+        right: 5px;
+    }
+
+    .user-type {
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .welcome {
+        font-weight: bold;
+        color: #4E76A1;
+        font-size: 18px;
+    }
+
+
+    .custom-form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/NewButtons.css" />
+    <link href="~/css/Nursedashboard.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="grid-container">
+        <header class="header">
+            <div class="menu-icon" onclick="openSidebar()">
+                <span class="material-icons-outlined">menu</span>
+            </div>
+            <div class="main-title">
+                <p class="font-weight-bold">Patient Dashboard</p>
+            </div>
+
+            <div class="header-right">
+                @if (isLoggedIn)
+                {
+                    <span class="welcome">Welcome, @username </span>
+
+                    <span class="user-type">@userType</span>
+                }
+            </div>
+
+        </header>
+
+        <aside id="sidebar" style="background-color:#00416A">
+            <div class="sidebar-title">
+                <div class="sidebar-brand">
+                    <h5 style="color:white"><i class="fa fa-heartbeat" style="color:white;font-size:27px" aria-hidden="true"></i> HELPING HANDS</h5>
+                </div>
+                <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+            </div>
+
+            <ul class="sidebar-list" style="color:white">
+                <li class="sidebar-list-item">
+                    <a asp-action="PatientDashboard" asp-controller="Patient" class="w3-bar-item w3-button"><i class="fas fa-window-maximize" style="font-size:20px;color:white;"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="SpecityCondition" asp-controller="Patient" id="specifyConditionLink" class="w3-bar-item w3-button"><i class="fa fa-medkit" aria-hidden="true" style="font-size:24px;color:white"></i> Specify Condition</a>
+
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-controller="Patient" asp-action="ListCareContracts" id="listCareContractsLink" class="w3-bar-item w3-button"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size:24px;color:white"></i> Create Contract</a>
+                </li>
+                <li class="sidebar-list-item">
+                    <a asp-action="PatientProfile" asp-controller="Patient" class="w3-bar-item w3-button"><i class="fa fa-user" aria-hidden="true" style="font-size:24px;color:white"></i> Profile</a>
+                </li>
+                <li class="sidebar-list-item">
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Logout" asp-controller="User" method="post">
+                            <button type="submit" style="background-color:#00416A;border:none;color:white"><i class="fa fa-sign-out" aria-hidden="true" style="font-size:24px;color:white"></i> Logout</button>
+                        </form>
+                    }
+                </li>
+
+      
+            </ul>
+        </aside>
+
+
+        <main class="main-container">
+
+            <div class="container light-style flex-grow-1 container-p-y">
+                
+                <div class="card overflow-hidden">
+                    <div class="row no-gutters row-bordered row-border-light">
+                        <div class="col-md-3 pt-0">
+                            <div class="list-group list-group-flush account-settings-links">
+                                <a class="list-group-item list-group-item-action active" data-toggle="list"
+                                   href="#account-general">User Profile</a>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="tab-content">
+                                <div class="tab-pane fade active show" id="account-general">
+                                    <hr class="border-light m-0">
+                                    <div class="card-body">
+                                        @if (string.IsNullOrEmpty(Model.Surname) &&
+                                        string.IsNullOrEmpty(Model.FirstName) &&
+                                        string.IsNullOrEmpty(Model.Gender) &&
+                                        string.IsNullOrEmpty(Model.Idnumber) &&
+                                        !Model.DateOfBirth.HasValue &&
+                                        string.IsNullOrEmpty(Model.EmergencyContactPerson) &&
+                                        string.IsNullOrEmpty(Model.EmergencyContactNumber) &&
+                                        string.IsNullOrEmpty(Model.AdditionalInformation))
+                                        {
+                                            <div class="alert alert-info">@username Please provide your details</div>
+                                        }
+
+                                        @if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
+                                        {
+                                            <h4 class="text-success">@TempData["SuccessMessage"]</h4>
+                                        }
+                                        <form asp-action="PatientProfile" method="post">
+                                            @Html.HiddenFor(model => model.PatientId)
+                                            <div class="form-group">
+                                                <label asp-for="Surname"></label>
+                                                <input type="text" asp-for="Surname" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="FirstName"></label>
+                                                <input type="text" asp-for="FirstName" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Gender"></label>
+                                                <select asp-for="Gender" class="form-control">
+                                                    <option value="M">Male</option>
+                                                    <option value="F">Female</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Idnumber"></label>
+                                                <input type="text" asp-for="Idnumber" class="form-control" id="Idnumber" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="DateOfBirth"></label>
+                                                <input type="date" asp-for="DateOfBirth" class="form-control" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label asp-for="EmergencyContactPerson"></label>
+                                                <input type="text" asp-for="EmergencyContactPerson" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="EmergencyContactNumber"></label>
+                                                <input type="text" asp-for="EmergencyContactNumber" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="AdditionalInformation"></label>
+                                                <textarea asp-for="AdditionalInformation" class="form-control"></textarea>
+                                            </div>
+                                            <br />
+                                            <button type="submit" id="updateButton" class="btn btn-primary">Update</button>
+
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+
+    </div>
+
+
+    <script src="~/js/Nurse.js"></script>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        $('#Idnumber').on('input', function () {
+            var idNumber = $(this).val();
+            if (idNumber.length >= 6) {
+                var year = idNumber.substring(0, 2);
+                var month = idNumber.substring(2, 4);
+                var day = parseInt(idNumber.substring(4, 6), 10); // Convert day to integer
+                // Adjust for YY to YYYY format
+                var currentYearTwoDigits = parseInt(new Date().getFullYear().toString().substring(2, 4), 10);
+                year = (parseInt(year, 10) < currentYearTwoDigits ? '20' : '19') + year;
+                var dob = new Date(year, month - 1, day + 1);  // Subtract 1 from month
+                $('#DateOfBirth').val(dob.toISOString().split('T')[0]);
+            } else if (idNumber.length === 0) {
+                // If the Idnumber field is cleared, clear the DateOfBirth field as well
+                $('#DateOfBirth').val('');
+            }
+        });
+    });
+
+    function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+    }
+    document.getElementById("specifyConditionLink").addEventListener("click", function (event) {
+        event.preventDefault();
+        $.ajax({
+            type: "GET",
+            url: "/Patient/CheckPatientDetails",
+            success: function (result) {
+                if (result.detailsExist) {
+                    window.location.href = '@Url.Action("SpecityCondition", "Patient")';
+                } else {
+                    alert("Please fill in create profile before specifying conditions.");
+                }
+            },
+            error: function () {
+            }
+        });
+    });
+
+    document.getElementById("listCareContractsLink").addEventListener("click", function (event) {
+        event.preventDefault();
+        $.ajax({
+            type: "GET",
+            url: "/Patient/CheckPatientDetails",
+            success: function (result) {
+                if (result.detailsExist) {
+                    window.location.href = '@Url.Action("ListCareContracts", "Patient")';
+                } else {
+                    alert("Please fill in create profile before creating care contract");
+                }
+            },
+            error: function () {
+            }
+        });
+    });
+
+
+
+</script>
+
+
+

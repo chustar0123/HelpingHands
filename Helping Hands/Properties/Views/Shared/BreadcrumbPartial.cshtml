@@ -1,0 +1,67 @@
+﻿
+@{
+    var userType = Context.Session.GetString("UserType");
+}
+@if (userType == "A")
+{
+    <div class="breadcrumb">
+        @Html.ActionLink("AdminDashboard", "AdminDashboard", "User", null, new { @class = "breadcrumb-link" })
+        @if (ViewContext.RouteData.Values["action"].ToString() == "EditStatus")
+        {
+            <span>&gt;</span>
+
+            @Html.ActionLink("EditStatus", "EditStatus", "User", null, new { @class = "breadcrumb-link" })
+        }
+        else if (ViewContext.RouteData.Values["action"].ToString() == "AddUser")
+        {
+            <span>&gt;</span>
+
+            @Html.ActionLink("AddUser", "AddUser", "User", null, new { @class = "breadcrumb-link" })
+        }
+    </div>
+}
+@if(userType == "O")
+{
+    
+    <div class="breadcrumb">
+        @Html.ActionLink("OfficeManager", "OfficeManager", "OfficeManager", null, new { @class = "breadcrumb-link" })
+
+        @if (ViewContext.RouteData.Values["controller"].ToString() == "OfficeManager")
+        {
+            @if (ViewContext.RouteData.Values["controller"].ToString() == "OfficeManager")
+            {
+                <span> &gt; </span>
+                @Html.ActionLink("ChronicCondition", "ChronicCondition", "OfficeManager", null, new { @class = "breadcrumb-link" })
+
+                @if (ViewContext.RouteData.Values["action"].ToString() == "InsertCondition")
+                {
+                    <span> &gt; </span>
+                    @Html.ActionLink("InsertCondition", "InsertCondition", "OfficeManager", null, new { @class = "breadcrumb-link" })
+                }
+                else if (ViewContext.RouteData.Values["action"].ToString() == "UpdateCondition")
+                {
+                    <span> &gt; </span>
+                    @Html.ActionLink("UpdateCondition", "UpdateCondition", "OfficeManager", null, new { @class = "breadcrumb-link" })
+                }
+                
+            }
+           
+      }
+        
+    </div>
+    
+
+}
+
+<style>
+   
+    .breadcrumb-link {
+        text-decoration: none; 
+        color: #007bff; 
+    }
+
+        .breadcrumb-link:hover {
+            text-decoration: none; 
+        }
+
+</style>

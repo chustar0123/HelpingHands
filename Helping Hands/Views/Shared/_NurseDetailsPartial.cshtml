@@ -1,0 +1,21 @@
+﻿<div class="breadcrumb">
+    @Html.ActionLink("OfficeManager", "OfficeManager", "OfficeManager", null, new { @class = "breadcrumb-link" })
+    @if (ViewContext.RouteData.Values["controller"].ToString() == "OfficeManager" && ViewContext.RouteData.Values["action"].ToString() == "NurseDetails")
+    {
+        <span>&gt;</span>
+
+        @Html.ActionLink("NurseDetails", "NurseDetails", "OfficeManager", null, new { @class = "breadcrumb-link" })
+    }
+</div>
+<style>
+   
+    .breadcrumb-link {
+        text-decoration: none; 
+        color: #007bff; 
+    }
+
+        .breadcrumb-link:hover {
+            text-decoration: none; 
+        }
+
+</style>
